@@ -1,0 +1,103 @@
+<html>
+<head>
+  <style>
+  body {
+    margin: 0px;
+    font-family: monospace;
+  }
+  #mg {
+    width: 1000px;
+    height: 220px;
+    border: 1px solid grey;
+    padding: 0px;
+    position: relative;
+    background-color: white;
+  }
+  #mg div {
+    background-color: #234746;
+    width:5px;
+    margin: 2px;
+    float: left;
+    position: absolute;
+    bottom: 0;
+  }
+  </style>
+</head>
+<body>
+  <img src="top-right.png" style="align: right; float: right; width: 80px;" />
+  <img src="xperts-logo.png" style="align:left; width: 120px; padding: 10px; margin-bottom: 40px;" />
+  <img src="mark-blue.png" style=" position: absolute; left: 950px; top: 270px; width: 100px;" />
+<script type="text/javascript">
+var times = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+var pingTime;
+var beat = 1000;
+
+
+function pong() {
+  //console.log( this );
+  var d = new Date();
+  if ( this.readyState == 4 && this.status == 200 ) {
+    saveTime( d.getTime()-pingTime );
+    showTimes();
+  }
+}
+
+function pongTimeout() {
+  saveTime( "LOST" );
+  showTimes();
+}
+
+const loop = ()=>{
+  var req = new XMLHttpRequest();
+  req.timeout = beat*0.8;
+  req.addEventListener("load", pong );
+  req.addEventListener("timeout", pongTimeout );
+  req.open( "GET", window.location.href+"?"+Math.random(), true );
+  //req.open( "GET", 'https://api.ipify.org/', true );
+  pingTime = new Date().getTime();
+  req.send();
+  loopStep = setTimeout(loop,beat);
+}
+
+function saveTime( newTime ) {
+  for( var i = 0 ; i < times.length-1 ; i++ ) {
+    times[i]=times[i+1];
+  }
+  times[ times.length-1 ] = newTime;
+  console.log( times );
+}
+
+function normalizeBeat( timesAvg ) {
+  if ( beat < timesAvg*4 ) beat *= 1.1;
+  if ( beat > timesAvg*4 ) beat *= 0.93;
+  if ( beat < 100 ) beat = 100;
+  if ( beat > 2000 ) beat = 2000;
+}
+
+function showTimes() {
+  var res = '';
+  var timesAvgCnt = timesAvgSum = 0;
+  for ( var i = 0 ; i < times.length ; i++ ) {
+    if ( times[i] == "LOST" ) {
+      res+='<div style="background-color: red; height:210px; left: '+i*7+'"></div>'
+    }
+    res+='<div style="height:'+( times[i]*200/beat )+'px; left: '+i*7+'"></div>'
+    if ( times[i]>0 ) {
+      timesAvgSum += times[i];
+      timesAvgCnt++;
+    }
+  }
+  document.getElementById("mg").innerHTML = res;
+  document.getElementById("avg").innerHTML = "Last: "+times[times.length-1]+"ms / Avg: "+(timesAvgSum/timesAvgCnt).toFixed(2)+"ms / beat: "+beat;
+  //normalizeBeat(timesAvgSum/timesAvgCnt);
+}
+
+var loopStep = setTimeout(loop, 2000);
+</script>
+
+<div id="mg"></div>
+<div id="avg"></div>
+<button onClick="loop()" type="button">Start</button>
+<button onClick="clearTimeout(loopStep)" type="button">Stop</button>
+</body>
+</html>
