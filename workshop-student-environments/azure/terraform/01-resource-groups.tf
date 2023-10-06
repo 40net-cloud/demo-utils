@@ -275,7 +275,7 @@ resource "azurerm_resource_group_policy_assignment" "limitvmimages2rg" {
 
   parameters = <<PARAMETERS
 {
-  "allowedImageSku": { "value": [ "fortinet_fg-vm", "fortinet_fg-vm_payg_20190624", "fortinet_fg-vm_payg_2022", "18.04-LTS", "20_04-lts", "22_04-lts" ] },
+  "allowedImageSku": { "value": [ "fortinet_fg-vm", "fortinet_fg-vm_payg_20190624", "fortinet_fg-vm_payg_2022", "fortinet_fg-vm_payg_2023", "18.04-LTS", "20_04-lts", "22_04-lts", "22_04-lts-gen2", "20_04-lts-gen2", "18_04-lts-gen2" ] },
   "allowedImageOffer": { "value": [ "fortinet_fortigate-vm_v5", "UbuntuServer", "0001-com-ubuntu-server-focal", "0001-com-ubuntu-server-jammy" ] },
   "allowedImagePublisher": { "value": [ "fortinet", "Canonical" ] }
 }
