@@ -1,0 +1,23 @@
+---
+- hosts: fgt
+  collections:
+    - fortinet.fortios
+  connection: httpapi
+  gather_facts: no
+  vars:
+    vdom: "root"
+    ansible_httpapi_use_ssl: yes
+    ansible_httpapi_validate_certs: no
+    ansible_httpapi_port: 443
+  tasks:
+    - name: Transit network address
+      fortios_firewall_address:
+        vdom: "{{ vdom }}"
+        state: "present"
+        enable_log: "true"
+        firewall_address:
+          name: "Transit"
+          subnet: "172.27.40.64/26"
+          type: "ipmask"
+          list: []
+          tagging: []
