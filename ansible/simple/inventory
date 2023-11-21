@@ -1,0 +1,5 @@
+[fgt]
+fgt  ansible_host="w.x.y.z" ansible_user="admin" ansible_password=""
+
+[fgt:vars]
+ansible_network_os=fortios
