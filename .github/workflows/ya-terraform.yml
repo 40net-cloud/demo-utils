@@ -1,15 +1,15 @@
 name: '[FGT] TF - Test'
 
 env:
-  TFPath: training/
+  TFPath: workshop-student-environments/azure/
 on:
   push:
     branches:
       - main
     paths:
-      - 'training/**.tf'
-      - 'training/**.tpl'
-      - 'training/**.hcl'
+      - 'workshop-student-environments/azure/**.tf'
+      - 'workshop-student-environments/azure/**.tpl'
+      - 'workshop-student-environments/azure/**.hcl'
   workflow_dispatch:
     inputs:
       location:
