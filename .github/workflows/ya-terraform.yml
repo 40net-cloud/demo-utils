@@ -1,0 +1,93 @@
+name: '[FGT] TF - Test'
+
+env:
+  TFPath: training/
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'training/**.tf'
+      - 'training/**.tpl'
+      - 'training/**.hcl'
+  workflow_dispatch:
+    inputs:
+      location:
+        description: 'Azure Region'
+        required: true
+        default: 'eastus'
+      prefix:
+        description: 'Deployment Prefix'
+        required: true
+        default: 'FORTIQA-Training'
+      ACCOUNTCOUNT:
+        description: 'ACCOUNTCOUNT'
+        required: true
+        default: '2'		
+      destroy:
+        description: 'Check the box to destroy infrastructure'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  terraform_Test:
+    name: 'Terraform YA-Test'
+    runs-on: ubuntu-latest
+    env:
+      TF_VAR_PREFIX: "${{ github.event.inputs.prefix }}"
+      TF_VAR_LOCATION: ${{ github.event.inputs.location }}
+      TF_VAR_ACCOUNTCOUNT: ${{ github.event.inputs.ACCOUNTCOUNT }}
+      TF_VAR_CUSTOMDOMAIN:  ${{ secrets.CUSTOMDOMAIN }}
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+      StorageKey: ${{ secrets.STORAGEKEY }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        run: az login --service-principal -u $ARM_CLIENT_ID -p $ARM_CLIENT_SECRET --tenant $ARM_TENANT_ID
+        
+      - name: "Setup Terraform"
+        uses: hashicorp/setup-terraform@v1
+        
+      - name: "Terraform Init"
+        id: init
+        run: |
+              terraform init \
+               -backend-config="key=${{ secrets.StorageKey }}"
+        working-directory: ${{ env.TFPath }}
+
+      - name: "Terraform Validate"
+        id: validate
+        run: terraform validate
+        working-directory: ${{ env.TFPath }}
+
+      - name: "Terraform Format"
+        id: format
+        run: terraform fmt -recursive
+        working-directory: ${{ env.TFPath }}
+
+      - name: "Terraform Plan"
+        id: plan
+        run: terraform plan -out plan.tfplan
+        working-directory: ${{ env.TFPath }}
+
+      - name: "Terraform Show"
+        id: show
+        run: terraform show -json plan.tfplan
+        working-directory: ${{ env.TFPath }}
+
+      - name: Terraform Apply
+        if: ${{ github.event.inputs.destroy != 'true' }}
+        run: terraform apply -auto-approve
+        working-directory: ${{ env.TFPath }}
+        
+      - name: Terraform Destroy
+        if: ${{ github.event.inputs.destroy == 'true' }}
+        run: terraform destroy -auto-approve
+        working-directory: ${{ env.TFPath }}
