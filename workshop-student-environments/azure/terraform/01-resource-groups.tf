@@ -67,10 +67,10 @@ resource "azurerm_role_assignment" "iam" {
 ##############################################################################################################
 
 resource "azurerm_policy_definition" "limitlocation" {
-  name         = "EMEA Training Limit Location"
+  name         = "${var.PREFIX} Limit Location"
   policy_type  = "Custom"
   mode         = "All"
-  display_name = "EMEA Training Limit Location"
+  display_name = "${var.PREFIX} Limit Location"
 
   policy_rule = <<POLICY_RULE
   {
@@ -104,11 +104,11 @@ PARAMETERS
 
 resource "azurerm_resource_group_policy_assignment" "limitlocation2rg" {
   count                = var.ACCOUNTCOUNT
-  name                 = "EMEA Training Limit Location ${var.PREFIX}-student${count.index}"
+  name                 = "${var.PREFIX} Limit Location student${count.index}"
   resource_group_id    = azurerm_resource_group.resourcegroup[count.index].id
   policy_definition_id = azurerm_policy_definition.limitlocation.id
-  description          = "EMEA Training Limit Location ${var.PREFIX}-student${count.index}"
-  display_name         = "EMEA Training Limit Location ${var.PREFIX}-student${count.index}"
+  description          = "${var.PREFIX} Limit Location student${count.index}"
+  display_name         = "${var.PREFIX} Limit Location student${count.index}"
 
   parameters = <<PARAMETERS
 {
@@ -121,10 +121,10 @@ PARAMETERS
 }
 
 resource "azurerm_policy_definition" "limitinstancesize" {
-  name         = "EMEA Training Limit Instance Size"
+  name         = "${var.PREFIX} Limit Instance Size"
   policy_type  = "Custom"
   mode         = "All"
-  display_name = "EMEA Training Limit Instance Size"
+  display_name = "${var.PREFIX} Limit Instance Size"
 
   policy_rule = <<POLICY_RULE
   {
@@ -167,11 +167,11 @@ PARAMETERS
 
 resource "azurerm_resource_group_policy_assignment" "limitinstancesize2rg" {
   count                = var.ACCOUNTCOUNT
-  name                 = "EMEA Training Limit Instance Size student${count.index}"
+  name                 = "${var.PREFIX} Limit Instance Size student${count.index}"
   resource_group_id    = azurerm_resource_group.resourcegroup[count.index].id
   policy_definition_id = azurerm_policy_definition.limitinstancesize.id
-  description          = "EMEA Training Limit Instance Size student${count.index}"
-  display_name         = "EMEA Training Limit Instance Size student${count.index}"
+  description          = "${var.PREFIX} Limit Instance Size student${count.index}"
+  display_name         = "${var.PREFIX} Limit Instance Size student${count.index}"
 
   parameters = <<PARAMETERS
 {
@@ -195,10 +195,10 @@ PARAMETERS
 }
 
 resource "azurerm_policy_definition" "limitvmimages" {
-  name         = "EMEA Training Limit VM Images"
+  name         = "${var.PREFIX} Limit VM Images"
   policy_type  = "Custom"
   mode         = "All"
-  display_name = "EMEA Training Limit VM Images"
+  display_name = "${var.PREFIX} Limit VM Images"
 
   policy_rule = <<POLICY_RULE
   {
@@ -267,11 +267,11 @@ PARAMETERS
 
 resource "azurerm_resource_group_policy_assignment" "limitvmimages2rg" {
   count                = var.ACCOUNTCOUNT
-  name                 = "EMEA Training Limit VM Images student${count.index}"
+  name                 = "${var.PREFIX} Limit VM Images student${count.index}"
   resource_group_id    = azurerm_resource_group.resourcegroup[count.index].id
   policy_definition_id = azurerm_policy_definition.limitvmimages.id
-  description          = "EMEA Training Limit VM Images student${count.index}"
-  display_name         = "EMEA Training Limit VM Images student${count.index}"
+  description          = "${var.PREFIX} Limit VM Images student${count.index}"
+  display_name         = "${var.PREFIX} Limit VM Images student${count.index}"
 
   parameters = <<PARAMETERS
 {
