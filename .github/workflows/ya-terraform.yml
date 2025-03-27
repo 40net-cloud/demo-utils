@@ -3,13 +3,13 @@ name: '[FGT] TF - Test'
 env:
   TFPath: workshop-student-environments/azure/terraform/
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'workshop-student-environments/azure/terraform/**.tf'
-      - 'workshop-student-environments/azure/terraform/**.tpl'
-      - 'workshop-student-environments/azure/terraform/**.hcl'
+#  push:
+#    branches:
+#      - main
+#    paths:
+#      - 'workshop-student-environments/azure/terraform/**.tf'
+#      - 'workshop-student-environments/azure/terraform/**.tpl'
+#      - 'workshop-student-environments/azure/terraform/**.hcl'
   workflow_dispatch:
     inputs:
       location:
@@ -27,7 +27,7 @@ on:
       destroy:
         description: 'Check the box to destroy infrastructure'
         required: false
-        default: 'false'
+        default: false
         type: boolean
 
 jobs:
