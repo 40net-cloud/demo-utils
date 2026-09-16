@@ -20,6 +20,10 @@ variable "CUSTOMDOMAIN" {
   description = "Verified custom domain to use for user accounts"
 }
 
+variable "SUBSCRIPTION_ID" {
+  description = "Azure subscription ID to deploy into"
+}
+
 ##############################################################################################################
 # Minimum terraform version
 ##############################################################################################################
@@ -39,6 +43,8 @@ terraform {
 }
 
 provider "azurerm" {
+  subscription_id = var.SUBSCRIPTION_ID
+
   features {
     resource_group {
       prevent_deletion_if_contains_resources = false

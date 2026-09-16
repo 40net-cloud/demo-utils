@@ -34,6 +34,32 @@ resource "azurerm_role_assignment" "iam" {
   count                = var.ACCOUNTCOUNT
 }
 
+/* variable "TAP_LIFETIME_MINUTES" {
+  description = "How long the Temporary Access Pass stays valid (minutes)"
+  default     = 480 # 8 hours - covers a workshop day
+}
+
+resource "null_resource" "tap" {
+  count = var.ACCOUNTCOUNT
+
+  # Re-run if the user gets replaced
+  triggers = {
+    user_id = azuread_user.users[count.index].id
+  }
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      az rest --method post \
+        --uri "https://graph.microsoft.com/v1.0/users/${azuread_user.users[count.index].id}/authentication/temporaryAccessPassMethods" \
+        --headers "Content-Type=application/json" \
+        --body '{"lifetimeInMinutes": ${var.TAP_LIFETIME_MINUTES}, "isUsableOnce": false}' \
+        --query temporaryAccessPass -o tsv > "${path.module}/../output/tap-${var.PREFIX}-student${count.index}.txt"
+    EOT
+  }
+
+  depends_on = [azuread_user.users]
+}
+ */
 #resource "azurerm_role_assignment" "iam2" {
 #  scope                = "/subscriptions/590be515-152e-431c-b10e-5e98bc348a5a/resourceGroups/JVH10-HA-RG"
 #  role_definition_name = "Reader"
@@ -66,7 +92,7 @@ resource "azurerm_role_assignment" "iam" {
 # Azure Policy
 ##############################################################################################################
 
-resource "azurerm_policy_definition" "limitlocation" {
+/* resource "azurerm_policy_definition" "limitlocation" {
   name         = "${var.PREFIX} Limit Location"
   policy_type  = "Custom"
   mode         = "All"
@@ -264,24 +290,24 @@ POLICY_RULE
 PARAMETERS
 
 }
-
-resource "azurerm_resource_group_policy_assignment" "limitvmimages2rg" {
-  count                = var.ACCOUNTCOUNT
-  name                 = "${var.PREFIX} Limit VM Images student${count.index}"
-  resource_group_id    = azurerm_resource_group.resourcegroup[count.index].id
-  policy_definition_id = azurerm_policy_definition.limitvmimages.id
-  description          = "${var.PREFIX} Limit VM Images student${count.index}"
-  display_name         = "${var.PREFIX} Limit VM Images student${count.index}"
-
-  parameters = <<PARAMETERS
-{
-  "allowedImageSku": { "value": [ "fortinet_fg-vm", "fortinet_fg-vm_payg_20190624", "fortinet_fg-vm_payg_2022", "fortinet_fg-vm_payg_2023", "18.04-LTS", "20_04-lts", "22_04-lts", "22_04-lts-gen2", "20_04-lts-gen2", "18_04-lts-gen2" ] },
-  "allowedImageOffer": { "value": [ "fortinet_fortigate-vm_v5", "UbuntuServer", "0001-com-ubuntu-server-focal", "0001-com-ubuntu-server-jammy" ] },
-  "allowedImagePublisher": { "value": [ "fortinet", "Canonical" ] }
-}
-PARAMETERS
-
-}
+ */
+#resource "azurerm_resource_group_policy_assignment" "limitvmimages2rg" {
+#  count                = var.ACCOUNTCOUNT
+#  name                 = "${var.PREFIX} Limit VM Images student${count.index}"
+#  resource_group_id    = azurerm_resource_group.resourcegroup[count.index].id
+#  policy_definition_id = azurerm_policy_definition.limitvmimages.id
+#  description          = "${var.PREFIX} Limit VM Images student${count.index}"
+#  display_name         = "${var.PREFIX} Limit VM Images student${count.index}"
+#
+#  parameters = <<PARAMETERS
+#{
+#  "allowedImageSku": { "value": [ "fortinet_fg-vm", "fortinet_fg-vm_payg_20190624", "fortinet_fg-vm_payg_2022", "fortinet_fg-vm_payg_2023", "18.04-LTS", "20_04-lts", "22_04-lts", "22_04-lts-gen2", "20_04-lts-gen2", "18_04-lts-gen2" ] },
+#  "allowedImageOffer": { "value": [ "fortinet_fortigate-vm_v5", "UbuntuServer", "0001-com-ubuntu-server-focal", "0001-com-ubuntu-server-jammy" ] },
+#  "allowedImagePublisher": { "value": [ "fortinet", "Canonical" ] }
+#}
+#PARAMETERS
+#
+#}
 
 #resource "azurerm_policy_set_definition" "example" {
 #  name         = "testPolicySet"

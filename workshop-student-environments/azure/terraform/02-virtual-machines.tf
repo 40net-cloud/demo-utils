@@ -24,12 +24,49 @@ resource "azurerm_subnet" "subnet1" {
   count                = var.ACCOUNTCOUNT
 }
 
+resource "azurerm_network_security_group" "nsg" {
+  name                = "${var.PREFIX}-lnx-nsg"
+  location            = var.LOCATION
+  resource_group_name = azurerm_resource_group.resourcegroup[count.index].name
+  count               = var.ACCOUNTCOUNT
+}
+
+resource "azurerm_network_security_rule" "nsgallowallout" {
+  name                        = "AllowAllOutbound"
+  resource_group_name         = azurerm_resource_group.resourcegroup[count.index].name
+  network_security_group_name = azurerm_network_security_group.nsg[count.index].name
+  priority                    = 100
+  direction                   = "Outbound"
+  access                      = "Allow"
+  protocol                    = "Tcp"
+  source_port_range           = "*"
+  destination_port_range      = "*"
+  source_address_prefix       = "*"
+  destination_address_prefix  = "*"
+  count               = var.ACCOUNTCOUNT
+}
+
+resource "azurerm_network_security_rule" "fgtnsgallowallin" {
+  name                        = "AllowAllInbound"
+  resource_group_name         = azurerm_resource_group.resourcegroup[count.index].name
+  network_security_group_name = azurerm_network_security_group.nsg[count.index].name
+  priority                    = 100
+  direction                   = "Inbound"
+  access                      = "Allow"
+  protocol                    = "Tcp"
+  source_port_range           = "*"
+  destination_port_range      = "*"
+  source_address_prefix       = "*"
+  destination_address_prefix  = "*"
+  count               = var.ACCOUNTCOUNT
+}
 
 resource "azurerm_public_ip" "lnxapip" {
   name                = "${var.PREFIX}-student${count.index}-VM-ip"
   location            = var.LOCATION
   resource_group_name = azurerm_resource_group.resourcegroup[count.index].name
-  allocation_method   = "Dynamic"
+  allocation_method   = "Static"
+  sku                 = "Standard"
   count               = var.ACCOUNTCOUNT
 }
 
@@ -48,31 +85,41 @@ resource "azurerm_network_interface" "lnxaifc" {
   }
 }
 
+resource "azurerm_network_interface_security_group_association" "ifcnsg" {
+  network_interface_id      = azurerm_network_interface.lnxaifc[count.index].id
+  network_security_group_id = azurerm_network_security_group.nsg[count.index].id
+  count                     = var.ACCOUNTCOUNT
+  depends_on = [
+    azurerm_network_interface.lnxaifc,
+    azurerm_network_security_group.nsg
+  ]
+}
+
 resource "azurerm_linux_virtual_machine" "lnxavm" {
   name                  = "${var.PREFIX}-student${count.index}-VM"
   location              = var.LOCATION
   resource_group_name   = azurerm_resource_group.resourcegroup[count.index].name
   network_interface_ids = [azurerm_network_interface.lnxaifc[count.index].id]
-  size               = "Standard_B1s"
+  size                  = "Standard_B2ts_v2"
   count                 = var.ACCOUNTCOUNT
 
   source_image_reference {
     publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-jammy"
-    sku       = "22_04-lts"
+    offer     = "ubuntu-26_04-lts"
+    sku       = "server"
     version   = "latest"
   }
 
   os_disk {
-    name              = "${var.PREFIX}-student${count.index}-VM-OSDISK"
-    caching           = "ReadWrite"
+    name                 = "${var.PREFIX}-student${count.index}-VM-OSDISK"
+    caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }
 
-  admin_username = "${var.PREFIX}-student${count.index}"
-  admin_password = "StudentPassword123!"
+  admin_username                  = "${var.PREFIX}-student${count.index}"
+  admin_password                  = "StudentPassword123!"
   disable_password_authentication = false
-  custom_data    = base64encode(templatefile("${path.module}/customdata-lnx.tpl", {}))
+  custom_data                     = base64encode(templatefile("${path.module}/customdata-lnx.tpl", {}))
 }
 
 ##############################################################################################################

@@ -23,6 +23,44 @@ set -e
 PLAN="terraform.tfplan"
 STATE="terraform.tfstate"
 
+if [ -z "$DEPLOY_SUBSCRIPTION_ID" ]
+then
+    # Input subscription ID
+    echo -n "Enter Azure subscription ID to deploy into: "
+    stty_orig=`stty -g` # save original terminal setting.
+    read subscription_id # read the subscription id
+    stty $stty_orig     # restore terminal setting.
+    if [ -z "$subscription_id" ]
+    then
+        echo "Azure subscription ID must be provided."
+        exit 1
+    fi
+else
+    subscription_id="$DEPLOY_SUBSCRIPTION_ID"
+fi
+export TF_VAR_SUBSCRIPTION_ID="$subscription_id"
+export ARM_SUBSCRIPTION_ID="$subscription_id"
+echo ""
+echo "--> Deployment into subscription $subscription_id ..."
+
+if [ -z "$DEPLOY_PREFIX" ]
+then
+    # Input prefix
+    echo -n "Enter prefix (e.g. emea-se): "
+    stty_orig=`stty -g` # save original terminal setting.
+    read prefix         # read the location
+    stty $stty_orig     # restore terminal setting.
+    if [ -z "$prefix" ]
+    then
+        prefix="emea-se"
+    fi
+else
+    prefix="$DEPLOY_PREFIX"
+fi
+export TF_VAR_PREFIX="$prefix"
+echo ""
+echo "--> Deployment with $prefix prefix ..."
+
 if [ -z "$DEPLOY_LOCATION" ]
 then
     # Input location
