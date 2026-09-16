@@ -1,5 +1,8 @@
 [fgt]
-fgt  ansible_host="w.x.y.z" ansible_user="admin" ansible_password=""
+roz  ansible_host="w.x.y.z" 
 
 [fgt:vars]
 ansible_network_os=fortios
+#ansible_httpapi_session_key={"access_token":"xxx"}
+ansible_user=admin
+ansible_password=xxx
